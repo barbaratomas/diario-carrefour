@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Diario Carrefour</title>
+<meta name="theme-color" content="#1d4f91">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Diario Carrefour">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icono-192.png">
+<link rel="apple-touch-icon" href="icono-180.png">
+<style>
+  :root{
+    --azul:#1d4f91; --azul-osc:#143a6b; --azul-suave:#e6eef8;
+    --rojo:#d6202b; --verde:#1f8a4c; --verde-suave:#e3f4ea;
+    --ambar:#c98a00; --ambar-suave:#fdf3d8; --rojo-suave:#fbe5e6;
+    --texto:#1b2430; --gris:#5b6676; --borde:#d5dce5; --fondo:#f4f7fb;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{font-family:"Segoe UI",Roboto,system-ui,-apple-system,Arial,sans-serif;background:var(--fondo);color:var(--texto);font-size:19px;line-height:1.35}
+  header{background:#fff;border-bottom:1px solid var(--borde);padding:12px 16px calc(10px) ;position:sticky;top:0;z-index:5;padding-top:calc(12px + env(safe-area-inset-top))}
+  .cab{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:680px;margin:0 auto}
+  .cab img{height:22px;width:auto}
+  .marca{font-weight:700;font-size:14px;letter-spacing:.06em;color:#fff;background:var(--azul);padding:5px 10px;border-radius:6px;white-space:nowrap}
+  .barra{max-width:680px;margin:10px auto 0;height:6px;background:var(--azul-suave);border-radius:6px;overflow:hidden}
+  .barra i{display:block;height:100%;width:0;background:var(--azul);transition:width .3s}
+  main{max-width:680px;margin:0 auto;padding:22px 16px 130px}
+  h1{font-size:26px;line-height:1.2;margin:4px 0 6px;color:var(--azul-osc)}
+  .sub{color:var(--gris);margin:0 0 18px;font-size:17px}
+  .paso{font-size:14px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:.06em}
+  .ops{display:grid;gap:10px}
+  .ops.dos{grid-template-columns:1fr 1fr}
+  .op{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:#fff;border:2px solid var(--borde);border-radius:14px;padding:14px 16px;font:inherit;color:inherit;cursor:pointer;min-height:64px}
+  .op .e{font-size:30px;line-height:1;flex:0 0 auto}
+  .op.sel{border-color:var(--azul);background:var(--azul-suave);box-shadow:inset 0 0 0 1px var(--azul)}
+  .op.sel::after{content:"✓";margin-left:auto;font-weight:800;color:var(--azul);font-size:22px}
+  .nombre{justify-content:flex-start;font-weight:600}
+  .ini{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:17px;flex:0 0 auto}
+  .grupo{margin:18px 0 8px;font-weight:700;color:var(--azul-osc);display:flex;align-items:center;gap:8px;font-size:18px}
+  .grupo:first-child{margin-top:0}
+  textarea,input[type=text]{width:100%;font:inherit;padding:14px;border:2px solid var(--borde);border-radius:12px;background:#fff;color:inherit}
+  textarea{min-height:150px;resize:vertical}
+  textarea:focus,input:focus{outline:none;border-color:var(--azul)}
+  .otro{margin-top:10px}
+  .act{background:#fff;border:1px solid var(--borde);border-radius:14px;padding:14px;margin-bottom:12px}
+  .act .t{display:flex;align-items:center;gap:12px;font-weight:600;margin-bottom:12px}
+  .act .t .e{font-size:30px}
+  .tres{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .tres button{font:inherit;font-size:16px;font-weight:600;border:2px solid var(--borde);background:#fff;border-radius:12px;padding:10px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--texto)}
+  .tres button span{font-size:24px}
+  .tres button.si.sel{background:var(--verde-suave);border-color:var(--verde)}
+  .tres button.av.sel{background:var(--ambar-suave);border-color:var(--ambar)}
+  .tres button.no.sel{background:var(--rojo-suave);border-color:var(--rojo)}
+  footer{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--borde);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+  .nav{max-width:680px;margin:0 auto;display:flex;gap:10px}
+  .btn{flex:1;font:inherit;font-weight:700;border-radius:14px;padding:16px;border:2px solid var(--azul);cursor:pointer;font-size:19px}
+  .btn.prim{background:var(--azul);color:#fff}
+  .btn.sec{background:#fff;color:var(--azul);flex:0 0 34%}
+  .btn:disabled{opacity:.4;cursor:default}
+  .aviso{color:var(--rojo);font-weight:600;margin-top:12px;min-height:1em;font-size:17px}
+  .resumen{background:#fff;border:1px solid var(--borde);border-radius:14px;padding:6px 16px}
+  .resumen div{padding:10px 0;border-bottom:1px solid #edf0f4;font-size:16px}
+  .resumen div:last-child{border:0}
+  .resumen b{display:block;color:var(--gris);font-size:13px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+  .fin{text-align:center;padding-top:30px}
+  .fin .ok{font-size:84px}
+  .fin h1{font-size:30px}
+  .pendientes{background:var(--ambar-suave);border:1px solid var(--ambar);border-radius:12px;padding:12px 14px;margin-bottom:18px;font-size:16px}
+  .fecha{display:inline-block;background:var(--azul-suave);color:var(--azul-osc);font-weight:600;border-radius:8px;padding:6px 10px;margin-bottom:16px;font-size:16px}
+</style>
+</head>
+<body>
+<header>
+  <div class="cab"><img src="logo.png" alt="ASINDOWN Formación"><span class="marca">CARREFOUR</span></div>
+  <div class="barra"><i id="barra"></i></div>
+</header>
+<main id="app"></main>
+<footer><div class="nav">
+  <button class="btn sec" id="atras">Atrás</button>
+  <button class="btn prim" id="sig">Siguiente</button>
+</div></footer>
+
+<script src="config.js"></script>
+<script>
+/* La dirección del servicio que guarda y envía el Excel está en config.js */
+var URL_ENVIO = window.URL_ENVIO || '';
+
+var ALUMNADO = ['Andrea','Gilberto','Joel','Jorge','Martí','Mateo','Pablo C.','Pablo M.','Pedro','Pepita','Sergio','Vega'];
+var COLORES = ['#1d4f91','#d6202b','#1f8a4c','#7a3fb0','#c25e00','#00796b','#3559c7','#a8326e','#4e6b16','#b03a2e','#0b7a99','#6d4c41'];
+
+var SECCIONES = [
+  { id:'textil', n:'Textil', e:'👕', tareas:[
+    ['👩‍💼','Reconocer a las responsables de la sección'],
+    ['🔒','Poner alarmas a la ropa'],
+    ['🔓','Quitar alarmas a la ropa'],
+    ['👟','Poner alarmas al calzado'],
+    ['🥾','Quitar alarmas al calzado'],
+    ['📏','Ordenar la ropa por tallas'],
+    ['🗄️','Ordenar el calzado en la estantería'],
+    ['👕','Perchar camisetas'],
+    ['👖','Perchar pantalones'],
+    ['✂️','Pelar la ropa (quitar el plástico)'],
+    ['🔄','Colocar dejados de textil'],
+    ['🧺','Doblar ropa'] ]},
+  { id:'bazar', n:'Bazar', e:'🏺', tareas:[
+    ['🎯','Encarar'],
+    ['↩️','Frontear (traer los productos hacia delante)'],
+    ['🔍','Reconocer intrusos'],
+    ['🔄','Colocar dejados de bazar'],
+    ['📟','Utilizar el lector de código de barras'],
+    ['🗑️','Reconocer mermas'] ]},
+  { id:'pgc', n:'PGC (Productos de Gran Consumo)', e:'🛒', tareas:[
+    ['🎯','Encarar'],
+    ['↩️','Frontear (traer los productos hacia delante)'],
+    ['🗑️','Reconocer mermas'],
+    ['📦','Retirar cartón'] ]}
+];
+
+var ACTITUDES = [
+  ['⏰','Soy puntual'],
+  ['📅','Leo, entiendo y recuerdo el cuadrante'],
+  ['🪪','Ficho'],
+  ['🦺','Me pongo el peto'],
+  ['🚻','Voy al baño en los momentos adecuados'],
+  ['👔','Cumplo con las normas de vestimenta'],
+  ['🧼','Cumplo con las normas de higiene'],
+  ['⌚','Llevo reloj'],
+  ['🗣️','Respondo al cliente de manera educada'],
+  ['📋','Cumplo las instrucciones de mi responsable'],
+  ['👋','Saludo a los trabajadores'],
+  ['☕','Cumplo con los horarios de descanso'],
+  ['🧥','Pliego y guardo el peto correctamente'],
+  ['📱','Utilizo el móvil en los horarios adecuados']
+];
+var BLOQUES_ACT = [[0,4],[4,8],[8,11],[11,14]];
+
+var CARAS_DIA = ['😄 Muy bien','🙂 Bien','😐 Normal','😟 Preocupada/o','😢 Triste','😠 Enfadada/o','😤 Frustrada/o','😰 Nerviosa/o','😴 Cansada/o'];
+var CARAS_EQUIPO = ['😄 Muy bien','🙂 Bien','😐 Normal','🙁 Regular','😣 Mal'];
+
+/* ===== Estado ===== */
+var R = {};      // respuestas
+var i = 0;       // pantalla actual
+
+/* ===== Pantallas ===== */
+var P = [
+  { id:'nombre', t:'¿Cómo te llamas?', sub:'Toca tu nombre.', tipo:'nombre', oblig:true },
+  { id:'secciones', t:'¿En qué sección has estado hoy?', sub:'Puedes tocar varias.', tipo:'secciones', oblig:true },
+  { id:'tareas', t:'¿Qué tareas has hecho hoy?', sub:'Toca todas las que has hecho.', tipo:'tareas', oblig:true },
+  { id:'todas', t:'¿Has podido hacer todas las tareas?', tipo:'una', oblig:true,
+    ops:['✅ Sí, todas','🟡 Algunas','❌ No'] },
+  { id:'noHechas', t:'¿Qué tarea no has podido hacer? ¿Por qué?', tipo:'texto', oblig:true,
+    si:function(){ return R.todas && R.todas.indexOf('Sí')<0; } },
+  { id:'cuenta', t:'Cuenta con tus palabras qué has hecho y cómo te ha salido', tipo:'texto', oblig:true },
+  { id:'gustado', t:'¿Qué tarea te ha gustado más? ¿Por qué?', tipo:'texto', oblig:true },
+  { id:'costado', t:'¿Qué tarea te ha costado más? ¿Por qué?', tipo:'texto', oblig:true },
+  { id:'act0', t:'Actitudes en el trabajo (1 de 4)', sub:'Piensa en hoy y contesta con sinceridad.', tipo:'actitudes', b:0, oblig:true },
+  { id:'act1', t:'Actitudes en el trabajo (2 de 4)', sub:'Piensa en hoy y contesta con sinceridad.', tipo:'actitudes', b:1, oblig:true },
+  { id:'act2', t:'Actitudes en el trabajo (3 de 4)', sub:'Piensa en hoy y contesta con sinceridad.', tipo:'actitudes', b:2, oblig:true },
+  { id:'act3', t:'Actitudes en el trabajo (4 de 4)', sub:'Piensa en hoy y contesta con sinceridad.', tipo:'actitudes', b:3, oblig:true },
+  { id:'necesitado', t:'¿Has necesitado ayuda hoy?', tipo:'una', oblig:true, ops:['👍 Sí','👎 No'] },
+  { id:'pedido', t:'¿Has pedido ayuda?', tipo:'una', oblig:true, ops:['👍 Sí','👎 No'],
+    si:function(){ return R.necesitado && R.necesitado.indexOf('Sí')>=0; } },
+  { id:'ayudaQuien', t:'¿Para qué tarea? ¿Quién te ha ayudado?', tipo:'corto', oblig:false, sub:'Si nadie te ha ayudado, pulsa Siguiente.',
+    si:function(){ return R.necesitado && R.necesitado.indexOf('Sí')>=0; } },
+  { id:'equipo', t:'¿Has trabajado en equipo hoy?', tipo:'una', oblig:true, ops:['👍 Sí','👎 No'] },
+  { id:'equipoSentir', t:'¿Cómo te has sentido trabajando en equipo?', tipo:'una', oblig:true, ops:CARAS_EQUIPO,
+    si:function(){ return R.equipo && R.equipo.indexOf('Sí')>=0; } },
+  { id:'problema', t:'¿Has tenido algún problema con algún compañero o compañera?', tipo:'una', oblig:true, ops:['👍 No','⚠️ Sí'] },
+  { id:'problemaCual', t:'¿Qué ha pasado? ¿Cómo lo habéis solucionado?', tipo:'texto', oblig:true,
+    si:function(){ return R.problema && R.problema.indexOf('Sí')>=0; } },
+  { id:'alTerminar', t:'Cuando has terminado una tarea, ¿qué has hecho?', tipo:'una', oblig:true,
+    ops:['🙋 He preguntado qué hacer','💡 He sabido qué hacer yo solo/a','⏸️ Me he quedado esperando'] },
+  { id:'descanso', t:'En el descanso, ¿has hablado con tus compañeros/as?', tipo:'una', oblig:true,
+    ops:['👍 Sí','🤏 Un poco','👎 No'] },
+  { id:'sentido', t:'¿Cómo te has sentido hoy?', sub:'Puedes tocar varias.', tipo:'varias', oblig:true, ops:CARAS_DIA },
+  { id:'sentidoMas', t:'¿Quieres contar algo más?', sub:'Si no quieres, pulsa Siguiente.', tipo:'texto', oblig:false },
+  { id:'resumen', t:'Revisa tu diario', sub:'Si está todo bien, pulsa Enviar.', tipo:'resumen' }
+];
+
+/* ===== Utilidades ===== */
+function el(tag, cls, txt){ var e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
+function visible(p){ return !p.si || p.si(); }
+function hoy(){ var d=new Date(); return d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'}); }
+function partir(s){ var m=s.match(/^(\S+)\s(.*)$/); return m?[m[1],m[2]]:['',s]; }
+function seccionesElegidas(){ return SECCIONES.filter(function(s){ return (R.secciones||[]).indexOf(s.id)>=0; }); }
+
+function opcion(emoji, texto, sel, onclick){
+  var b=el('button','op'+(sel?' sel':''));
+  b.type='button';
+  if(emoji){ b.appendChild(el('span','e',emoji)); }
+  b.appendChild(el('span','',texto));
+  b.onclick=onclick;
+  return b;
+}
+
+/* ===== Pintar ===== */
+function pintar(){
+  var p=P[i], app=document.getElementById('app');
+  app.innerHTML='';
+  window.scrollTo(0,0);
+  var total=P.filter(visible).length, pos=P.slice(0,i+1).filter(visible).length;
+  document.getElementById('barra').style.width=(pos/total*100)+'%';
+
+  if(p.id==='nombre'){ app.appendChild(el('div','fecha','📅 '+hoy())); pendientesAviso(app); }
+  app.appendChild(el('div','paso','Pregunta '+pos+' de '+(total-1)));
+  if(p.tipo==='resumen') app.lastChild.textContent='Último paso';
+  app.appendChild(el('h1','',p.t));
+  if(p.sub) app.appendChild(el('p','sub',p.sub));
+
+  var cont=el('div','');
+  app.appendChild(cont);
+
+  if(p.tipo==='nombre'){
+    var g=el('div','ops dos');
+    ALUMNADO.forEach(function(n,k){
+      var b=el('button','op nombre'+(R.nombre===n?' sel':'')); b.type='button';
+      var c=el('span','ini',n.charAt(0)); c.style.background=COLORES[k%COLORES.length];
+      b.appendChild(c); b.appendChild(el('span','',n));
+      b.onclick=function(){ R.nombre=n; try{localStorage.setItem('dc_nombre',n);}catch(e){} pintar(); };
+      g.appendChild(b);
+    });
+    cont.appendChild(g);
+  }
+
+  if(p.tipo==='secciones'){
+    var g2=el('div','ops');
+    SECCIONES.forEach(function(s){
+      var arr=R.secciones||[], on=arr.indexOf(s.id)>=0;
+      g2.appendChild(opcion(s.e,s.n,on,function(){
+        R.secciones=on?arr.filter(function(x){return x!==s.id;}):arr.concat(s.id);
+        pintar();
+      }));
+    });
+    cont.appendChild(g2);
+  }
+
+  if(p.tipo==='tareas'){
+    R.tareas=R.tareas||{};
+    seccionesElegidas().forEach(function(s){
+      var gr=el('div','grupo'); gr.appendChild(el('span','',s.e)); gr.appendChild(el('span','',s.n)); cont.appendChild(gr);
+      var g3=el('div','ops');
+      var sel=R.tareas[s.id]=R.tareas[s.id]||[];
+      s.tareas.forEach(function(t){
+        var on=sel.indexOf(t[1])>=0;
+        g3.appendChild(opcion(t[0],t[1],on,function(){
+          R.tareas[s.id]=on?sel.filter(function(x){return x!==t[1];}):sel.concat(t[1]);
+          pintar();
+        }));
+      });
+      cont.appendChild(g3);
+    });
+    var gr2=el('div','grupo','✏️ ¿Has hecho otra tarea? Escríbela (si quieres)'); cont.appendChild(gr2);
+    var inp=el('input'); inp.type='text'; inp.value=R.otraTarea||''; inp.placeholder='Otra tarea';
+    inp.oninput=function(){ R.otraTarea=inp.value; };
+    cont.appendChild(inp);
+  }
+
+  if(p.tipo==='una' || p.tipo==='varias'){
+    var g4=el('div','ops');
+    p.ops.forEach(function(o){
+      var pr=partir(o), v=pr[1];
+      var on = p.tipo==='una' ? R[p.id]===o : (R[p.id]||[]).indexOf(o)>=0;
+      g4.appendChild(opcion(pr[0],v,on,function(){
+        if(p.tipo==='una'){ R[p.id]=o; pintar(); setTimeout(function(){ if(P[i]===p) avanzar(); },250); }
+        else { var a=R[p.id]||[]; R[p.id]=on?a.filter(function(x){return x!==o;}):a.concat(o); pintar(); }
+      }));
+    });
+    cont.appendChild(g4);
+  }
+
+  if(p.tipo==='texto' || p.tipo==='corto'){
+    var ta = p.tipo==='texto' ? el('textarea') : el('input');
+    if(p.tipo==='corto') ta.type='text';
+    ta.value=R[p.id]||''; ta.placeholder='Escribe aquí';
+    ta.oninput=function(){ R[p.id]=ta.value; };
+    cont.appendChild(ta);
+  }
+
+  if(p.tipo==='actitudes'){
+    R.act=R.act||{};
+    var r=BLOQUES_ACT[p.b];
+    ACTITUDES.slice(r[0],r[1]).forEach(function(a){
+      var box=el('div','act'), t=el('div','t');
+      t.appendChild(el('span','e',a[0])); t.appendChild(el('span','',a[1])); box.appendChild(t);
+      var tres=el('div','tres');
+      [['si','✅','Sí'],['av','🟡','A veces'],['no','❌','No']].forEach(function(o){
+        var b=el('button',o[0]+(R.act[a[1]]===o[2]?' sel':'')); b.type='button';
+        b.appendChild(el('span','',o[1])); b.appendChild(document.createTextNode(o[2]));
+        b.onclick=function(){ R.act[a[1]]=o[2]; pintar(); };
+        tres.appendChild(b);
+      });
+      box.appendChild(tres); cont.appendChild(box);
+    });
+  }
+
+  if(p.tipo==='resumen'){
+    var res=el('div','resumen');
+    filas().forEach(function(f){
+      if(!f[1]) return;
+      var d=el('div',''); d.appendChild(el('b','',f[0])); d.appendChild(document.createTextNode(f[1])); res.appendChild(d);
+    });
+    cont.appendChild(res);
+  }
+
+  app.appendChild(el('div','aviso')).id='aviso';
+
+  document.getElementById('atras').style.visibility = i===0 ? 'hidden':'visible';
+  var sig=document.getElementById('sig');
+  sig.textContent = p.tipo==='resumen' ? '📨 Enviar' : 'Siguiente';
+  sig.disabled=false;
+}
+
+function pendientesAviso(app){
+  var n=cola().length;
+  if(n){ var d=el('div','pendientes','📶 Hay '+n+' diario(s) guardado(s) en este móvil esperando conexión. Se enviarán solos.'); app.appendChild(d); }
+}
+
+/* ===== Validar y moverse ===== */
+function completo(p){
+  if(!p.oblig) return true;
+  if(p.tipo==='nombre') return !!R.nombre;
+  if(p.tipo==='secciones') return (R.secciones||[]).length>0;
+  if(p.tipo==='tareas'){
+    var n=0; seccionesElegidas().forEach(function(s){ n+=(R.tareas[s.id]||[]).length; });
+    return n>0 || (R.otraTarea||'').trim().length>0;
+  }
+  if(p.tipo==='varias') return (R[p.id]||[]).length>0;
+  if(p.tipo==='actitudes'){
+    var r=BLOQUES_ACT[p.b];
+    return ACTITUDES.slice(r[0],r[1]).every(function(a){ return R.act && R.act[a[1]]; });
+  }
+  return !!(R[p.id] && String(R[p.id]).trim());
+}
+function avanzar(){
+  var p=P[i];
+  if(p.tipo==='resumen'){ enviar(); return; }
+  if(!completo(p)){
+    document.getElementById('aviso').textContent = p.tipo==='actitudes' ? 'Contesta todas antes de seguir.' :
+      (p.tipo==='texto'||p.tipo==='corto') ? 'Escribe tu respuesta antes de seguir.' : 'Elige una respuesta antes de seguir.';
+    return;
+  }
+  do { i++; } while(i<P.length-1 && !visible(P[i]));
+  pintar();
+}
+function retroceder(){
+  do { i--; } while(i>0 && !visible(P[i]));
+  pintar();
+}
+document.getElementById('sig').onclick=avanzar;
+document.getElementById('atras').onclick=retroceder;
+
+/* ===== Datos para el Excel (siempre las mismas columnas) ===== */
+function txt(v){ return Array.isArray(v) ? v.map(function(x){return partir(x)[1];}).join(', ') : (v ? partir(v)[1] : ''); }
+function sinEmoji(v){ return v ? partir(v)[1] : ''; }
+function vis(id){ return visible(P.filter(function(p){return p.id===id;})[0]); }
+function filas(){
+  var f=[];
+  f.push(['Nombre', R.nombre||'']);
+  f.push(['Secciones', seccionesElegidas().map(function(s){return s.n;}).join(', ')]);
+  SECCIONES.forEach(function(s){
+    f.push(['Tareas '+s.n.split(' (')[0], (R.secciones||[]).indexOf(s.id)>=0 ? (R.tareas&&R.tareas[s.id]||[]).join(', ') : '']);
+  });
+  f.push(['Otra tarea', R.otraTarea||'']);
+  f.push(['¿Ha podido hacer todas las tareas?', sinEmoji(R.todas)]);
+  f.push(['Tarea que no ha podido hacer y por qué', vis('noHechas') ? (R.noHechas||'') : '']);
+  f.push(['Qué ha hecho y cómo le ha salido', R.cuenta||'']);
+  f.push(['Tarea que más le ha gustado', R.gustado||'']);
+  f.push(['Tarea que más le ha costado', R.costado||'']);
+  ACTITUDES.forEach(function(a){ f.push([a[1], R.act&&R.act[a[1]]||'']); });
+  f.push(['¿Ha necesitado ayuda?', sinEmoji(R.necesitado)]);
+  f.push(['¿Ha pedido ayuda?', vis('pedido') ? sinEmoji(R.pedido) : '']);
+  f.push(['Para qué tarea y quién le ha ayudado', vis('ayudaQuien') ? (R.ayudaQuien||'') : '']);
+  f.push(['¿Ha trabajado en equipo?', sinEmoji(R.equipo)]);
+  f.push(['Cómo se ha sentido en equipo', vis('equipoSentir') ? sinEmoji(R.equipoSentir) : '']);
+  f.push(['¿Problema con algún compañero/a?', sinEmoji(R.problema)]);
+  f.push(['Qué ha pasado y cómo lo han solucionado', vis('problemaCual') ? (R.problemaCual||'') : '']);
+  f.push(['Al terminar una tarea', sinEmoji(R.alTerminar)]);
+  f.push(['¿Ha hablado con compañeros/as en el descanso?', sinEmoji(R.descanso)]);
+  f.push(['Cómo se ha sentido hoy', txt(R.sentido)]);
+  f.push(['Algo más', R.sentidoMas||'']);
+  return f;
+}
+
+/* ===== Envío (con cola si no hay conexión) ===== */
+function cola(){ try{ return JSON.parse(localStorage.getItem('dc_cola')||'[]'); }catch(e){ return []; } }
+function guardarCola(c){ try{ localStorage.setItem('dc_cola',JSON.stringify(c)); }catch(e){} }
+
+function mandar(diario){
+  return fetch(URL_ENVIO,{ method:'POST', body:JSON.stringify(diario) })
+    .then(function(r){ return r.json(); })
+    .then(function(j){ if(!j || !j.ok) throw new Error(j && j.error || 'Error'); return j; });
+}
+function vaciarCola(){
+  var c=cola(); if(!c.length) return Promise.resolve();
+  var primero=c[0];
+  return mandar(primero).then(function(){ guardarCola(cola().slice(1)); return vaciarCola(); }).catch(function(){});
+}
+
+function enviar(){
+  var sig=document.getElementById('sig'); sig.disabled=true; sig.textContent='Enviando…';
+  var d=new Date();
+  var diario={ id: d.getTime()+'-'+Math.random().toString(36).slice(2,7),
+    fecha: d.toLocaleDateString('es-ES'), hora: d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),
+    filas: filas() };
+  mandar(diario).then(function(){ final(true); vaciarCola(); })
+  .catch(function(){
+    var c=cola(); c.push(diario); guardarCola(c); final(false);
+  });
+}
+
+function final(ok){
+  var app=document.getElementById('app'); app.innerHTML='';
+  document.getElementById('barra').style.width='100%';
+  var f=el('div','fin');
+  f.appendChild(el('div','ok', ok?'✅':'📶'));
+  f.appendChild(el('h1','', ok?'¡Diario enviado!':'Diario guardado'));
+  f.appendChild(el('p','sub', ok?'Buen trabajo hoy, '+String(R.nombre).replace(/\.$/,'')+'.':'Ahora no hay conexión. Tu diario está guardado en el móvil y se enviará solo cuando vuelvas a abrir la app con internet.'));
+  app.appendChild(f);
+  document.getElementById('atras').style.visibility='hidden';
+  var sig=document.getElementById('sig'); sig.disabled=false; sig.textContent='Hacer otro diario';
+  sig.onclick=function(){ R={}; i=0; sig.onclick=avanzar; pintar(); };
+}
+
+/* ===== Inicio ===== */
+try{ var n=localStorage.getItem('dc_nombre'); if(n && ALUMNADO.indexOf(n)>=0) R.nombre=n; }catch(e){}
+pintar();
+vaciarCola();
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(function(){}); }
+</script>
+</body>
+</html>
